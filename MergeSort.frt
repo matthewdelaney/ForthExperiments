@@ -1,3 +1,5 @@
+\ This is a more factored version of the Merge Sort example from Rosetta Code
+
 variable temp
 variable merge-temp
 
@@ -11,11 +13,12 @@ variable merge-temp
   2dup - ;
 
 : merge-step ( right mid left -- right mid+ left+ )
-  top-two-vals < if
-    under-val temp ! 
-    diff-top-two over dup cell+ rot move
-    temp @ over !
-    temp ! cell+ 2dup = if dup else temp @ then
+  top-two-vals < if				\ Is mid less than left?
+    under-val temp !				\ If so, store mid in temp 
+    diff-top-two over dup cell+			\ ( right mid left (mid-left) left left+
+    rot move					\ Bring (mid-left) to top and MOVE
+    temp @ over !				\ Retrieve mid and store in left
+    temp ! cell+ 2dup = if dup else temp @ then 
   then cell+ ;
 
 : merge ( right mid left -- right left )
@@ -23,9 +26,15 @@ variable merge-temp
  
 : mid ( l r -- mid ) over - 2/ cell negate and + ;
  
+: mid-addr ( right left -- left right mid )
+  swap 2dup mid ;
+
 : mergesort ( right left -- right left )
   2dup cell+ <= if exit then
-  swap 2dup mid recurse rot recurse merge ;
+  mid-addr recurse				\ Call with ( right mid )
+  rot
+  recurse					\ Call with ( mid left )
+  merge ;					\ Merge right and left
  
 : sort ( addr len -- )  cells over + swap mergesort 2drop ;
  
