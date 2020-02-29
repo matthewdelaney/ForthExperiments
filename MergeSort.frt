@@ -1,3 +1,5 @@
+variable temp
+
 : top-two-vals ( addr addr -- n n )
   over @ over @ ;
 
@@ -9,10 +11,10 @@
 
 : merge-step ( right mid left -- right mid+ left+ )
   top-two-vals < if
-    under-val >r
+    under-val temp ! 
     diff-top-two over dup cell+ rot move
-    r> over !
-    >r cell+ 2dup = if rdrop dup else r> then
+    temp @ over !
+    temp ! cell+ 2dup = if dup else temp @ then
   then cell+ ;
 : merge ( right mid left -- right left )
   dup >r begin 2dup > while merge-step repeat 2drop r> ;
