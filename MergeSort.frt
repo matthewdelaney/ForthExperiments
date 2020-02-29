@@ -1,4 +1,5 @@
 variable temp
+variable merge-temp
 
 : top-two-vals ( addr addr -- n n )
   over @ over @ ;
@@ -16,8 +17,9 @@ variable temp
     temp @ over !
     temp ! cell+ 2dup = if dup else temp @ then
   then cell+ ;
+
 : merge ( right mid left -- right left )
-  dup >r begin 2dup > while merge-step repeat 2drop r> ;
+  dup merge-temp ! begin 2dup > while merge-step repeat 2drop merge-temp @ ;
  
 : mid ( l r -- mid ) over - 2/ cell negate and + ;
  
