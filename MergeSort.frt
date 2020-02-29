@@ -3,18 +3,18 @@
 variable temp
 variable merge-temp
 
-: top-two-vals ( addr addr -- n n )
+: 2dup* ( addr addr -- n n )
   over @ over @ ;
 
-: under-val ( addr addr -- addr addr n )
+: over* ( addr addr -- addr addr n )
   over @ ;
 
 : diff-top-two ( addr addr -- n )
   2dup - ;
 
 : merge-step ( right mid left -- right mid+ left+ )
-  top-two-vals < if				\ Is mid less than left?
-    under-val temp !				\ If so, store mid in temp 
+  2dup* < if					\ Is mid less than left?
+    over* temp !				\ If so, store mid in temp 
     diff-top-two over dup cell+			\ ( right mid left (mid-left) left left+
     rot move					\ Bring (mid-left) to top and MOVE
     temp @ over !				\ Retrieve mid and store in left
