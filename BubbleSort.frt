@@ -2,15 +2,15 @@ VARIABLE CHANGED
 
 0 CHANGED !
 
-: DUP-FIRST
+: GET-VAL-OF 
   DUP @
 ;
 
-: ADDR-OF-SECOND
+: NEXT-ADDR 
   DUP 1 CELLS +
 ;
 
-: MOVE-SECOND-VALUE-TO-FIRST
+: STORE-VAL-IN-UNDER-ADDR 
   @ OVER !
 ;
 
@@ -18,21 +18,33 @@ VARIABLE CHANGED
   1 CELLS +
 ;
 
-: SWAPPER ( ADDR -- )
-  DUP-FIRST >R
-  ADDR-OF-SECOND
-  MOVE-SECOND-VALUE-TO-FIRST
+: SWAP-ADJ-VALS ( ADDR -- )
+  GET-VAL-OF >R
+  NEXT-ADDR 
+  STORE-VAL-IN-UNDER-ADDR 
   R> SWAP                              \ Retrieve first value and swap with addr so addr is on top of stack
   INC-ADDR
   !                                    \ Store first value in second
 ;
 
+: GET-VAL-OF-UNDER-ADDR ( ADDR -- N )
+  OVER 1 CELLS + @ ;
+
+: RESET-CHANGE-FLAG ( -- )
+  0 CHANGED ! ;
+
+: SET-CHANGE-FLAG ( -- )
+  -1 CHANGED ! ;
+
+: PUSH-N'TH-ADDR ( ADDR N -- ADDR )
+  OVER SWAP CELLS + ;
+
 : SWAP-IF ( ADDR -- )
-  DUP @
-  OVER 1 CELLS + @
+  GET-VAL-OF 
+  GET-VAL-OF-UNDER-ADDR
   > IF
-    SWAPPER
-    -1 CHANGED !
+    SWAP-ADJ-VALS 
+    SET-CHANGE-FLAG
   ELSE
     DROP                               \ If we don't swap then addr will not be consumed so do that here
   THEN
@@ -42,9 +54,9 @@ VARIABLE CHANGED
   1 -
   BEGIN
     2DUP
-    0 CHANGED !
+    RESET-CHANGE-FLAG
     0 DO
-      DUP I CELLS +
+      I PUSH-N'TH-ADDR
       SWAP-IF
     LOOP
     DROP                               \ Remove left-over duplicated ADDR
@@ -65,5 +77,6 @@ VARIABLE TESTARR 9 CELLS ALLOT
 : RUN-TEST
   GEN-TEST-DATA
   TESTARR 10 BUBBLE-SORT
+  CR
   DISPLAY-TEST-DATA
 ;
