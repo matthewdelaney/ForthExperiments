@@ -1,4 +1,5 @@
 \ This is a more factored version of the Merge Sort example from Rosetta Code
+\ Since the original was covered by the GNU FDL v1.2, this is as well. See fdl-1.2.txt.
 
 variable temp
 variable merge-temp
@@ -12,14 +13,24 @@ variable merge-temp
 : diff-top-two ( addr addr -- n )
   2dup - ;
 
+: stash-over* ( addr addr -- addr addr ) over* temp ! ;
+
+: set-up-diff-move ( addr1 addr2 -- addr1 addr2 addr2 addr2+ addr1-addr2 ) diff-top-two over dup cell+ rot ;
+
+: move-diff-cells ( addr addr -- addr addr ) set-up-diff-move move ;
+
+: get-stash temp @ ;
+
+: put-stash temp ! ;
+
 : merge-step ( right mid left -- right mid+ left+ )
-  2dup* < if					\ Is mid less than left?
-    over* temp !				\ If so, store mid in temp 
-    diff-top-two over dup cell+			\ ( right mid left (mid-left) left left+
-    rot move					\ Bring (mid-left) to top and MOVE
-    temp @ over !				\ Retrieve mid and store in left
-    temp ! cell+ 2dup = if dup else temp @ then 
-  then cell+ ;
+  2dup* < if					\ Is mid less than left? ( right mid left )
+    stash-over*					\ If so, store mid* in temp ( right mid left )
+    move-diff-cells				\ Move (mid-left) cells from left to left+ ( right mid left )
+    get-stash over !				\ Retrieve mid* and store in left ( right mid left ) 
+    put-stash cell+				\ Store left in temp and increment mid ( right mid+ ) 
+    2dup = if dup else get-stash then		\ If right == mid+ then dup mid+ else retrieve left ( right mid+ mid+|left )
+  then cell+ ~~ ;				\ Increment mid+|left ( right mid+ mid++|left+ )
 
 : merge ( right mid left -- right left )
   dup merge-temp ! begin 2dup > while merge-step repeat 2drop merge-temp @ ;
@@ -38,7 +49,7 @@ variable merge-temp
  
 : sort ( addr len -- )  cells over + swap mergesort 2drop ;
  
-create test 8 , 1 , 5 , 3 , 9 , 0 , 2 , 7 , 6 , 4 ,
+create test 8 , 1 , 3 , 5 , 9 , 4 , 6 , 2 , 7 , 0 ,
  
 : .array ( addr len -- ) 0 do dup i cells + @ . loop drop ;
  
