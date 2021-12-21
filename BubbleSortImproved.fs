@@ -1,4 +1,11 @@
-variable changed
+\ Author: Matt Delaney
+\ Date: Monday, December 20th 2021
+\ Description: This is a rewritten version of BubbleSort designed
+\ to be closer to the philosophy outlined in Leo Brodie's "Thinking Forth".
+\ The main 'bubble' word is definitely easier to read but I think some of the
+\ lower-level words could use some factoring.
+\ I've also eliminated the use of a global-variable to track whether or not
+\ a changed was made.
 
 : sorted? ( b -- b )
     false =
