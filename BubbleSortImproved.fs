@@ -31,10 +31,6 @@
     drop true
 ;
 
-: no-change
-    false
-;
-
 : for-pairs
     over 0
 ;
